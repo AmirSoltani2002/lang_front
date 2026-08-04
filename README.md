@@ -43,4 +43,4 @@ npm run build
 
 ## Jenkins
 
-The root `Jenkinsfile` runs `npm ci`, tests, the production build, and a Docker build. Set the `VITE_API_URL` Jenkins parameter to the public backend URL when creating a deployable image. The Jenkins agent must provide Node.js 22, Docker, and permission to access the Docker daemon.
+The root `Jenkinsfile` runs `npm ci`, tests, and the production build inside `node:22-alpine`, then builds the image inside `docker:27-cli`. Set the `VITE_API_URL` Jenkins parameter to the public backend URL. Install Jenkins' Docker Pipeline plugin and make the Docker socket available to Jenkins (`/var/run/docker.sock`).
