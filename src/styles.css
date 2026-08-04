@@ -136,6 +136,7 @@ blockquote { margin: 0; padding: 18px 20px; background: #f3f0e7; border-left: 3p
 .signin-card h2 { font-size: 38px; margin-bottom: 10px; }
 .signin-card > p:not(.eyebrow):not(.form-error) { color: var(--muted); line-height: 1.55; margin-bottom: 28px; }
 .signin-card label { display: block; margin-bottom: 9px; }
+.signin-hint { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 12px 0 0; }
 
 @media (max-width: 900px) {
   .app-shell { grid-template-columns: 1fr; }
