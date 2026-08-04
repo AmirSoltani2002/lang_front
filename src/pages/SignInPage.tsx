@@ -9,24 +9,36 @@ interface SignInPageProps {
 
 export function SignInPage({ onSignIn }: SignInPageProps) {
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedId, setSelectedId] = useState("");
+  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     api.users()
       .then((items) => {
         setUsers(items);
-        setSelectedId(items[0]?.id.toString() ?? "");
       })
       .catch((caught: unknown) => setError(caught instanceof Error ? caught.message : "Could not load learners."))
       .finally(() => setLoading(false));
   }, []);
 
-  const submit = (event: React.FormEvent) => {
+  const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const user = users.find((item) => item.id === Number(selectedId));
-    if (user) onSignIn(user);
+    const cleanedUsername = username.trim();
+    if (!cleanedUsername) return;
+
+    setSubmitting(true);
+    setError("");
+    try {
+      const existingUser = users.find((user) => user.username === cleanedUsername);
+      const user = existingUser ?? await api.createUser(cleanedUsername);
+      onSignIn(user);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not continue with that learner.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -48,28 +60,33 @@ export function SignInPage({ onSignIn }: SignInPageProps) {
 
       <section className="signin-panel">
         <form className="signin-card" onSubmit={submit}>
-          <p className="eyebrow">Welcome back</p>
-          <h2>Choose your profile</h2>
-          <p>No passwords for this first version—just select who is learning.</p>
+          <p className="eyebrow">Welcome</p>
+          <h2>Who is learning?</h2>
+          <p>Enter your name to continue. A new profile is created automatically the first time.</p>
 
-          <label htmlFor="learner">Learner</label>
-          <select
+          <label htmlFor="learner">Your name</label>
+          <input
             id="learner"
-            value={selectedId}
-            onChange={(event) => setSelectedId(event.target.value)}
-            disabled={loading}
-          >
-            {loading && <option>Loading learners…</option>}
-            {users.map((user) => <option key={user.id} value={user.id}>{user.username}</option>)}
-          </select>
+            list="learners"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            disabled={loading || submitting}
+            maxLength={64}
+            required
+            placeholder={loading ? "Loading learners…" : "e.g. Amirabbas"}
+            autoComplete="username"
+          />
+          <datalist id="learners">
+            {users.map((user) => <option key={user.id} value={user.username} />)}
+          </datalist>
 
           {error && <p className="form-error" role="alert">{error}</p>}
-          {!loading && !error && users.length === 0 && (
-            <p className="form-error">No users exist yet. Add one through the backend API.</p>
+          {!loading && users.length > 0 && (
+            <p className="signin-hint">Existing learners appear as suggestions while you type.</p>
           )}
 
-          <button className="button primary full" type="submit" disabled={!selectedId || loading}>
-            Continue learning <span aria-hidden="true">→</span>
+          <button className="button primary full" type="submit" disabled={!username.trim() || loading || submitting}>
+            {submitting ? "Opening profile…" : "Continue learning"} <span aria-hidden="true">→</span>
           </button>
         </form>
       </section>
