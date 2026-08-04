@@ -37,6 +37,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   users: () => request<User[]>("/users"),
+  createUser: (username: string) =>
+    request<User>("/users", {
+      method: "POST",
+      body: JSON.stringify({ username }),
+    }),
   languages: () => request<Language[]>("/languages"),
   generateExample: (payload: { language_id: number; word: string; meaning?: string }) =>
     request<{ example: string }>("/examples/generate", {
@@ -54,6 +59,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  words: (userId: number) => request<WordEntry[]>(`/words?user_id=${userId}`),
   dueReminders: (userId: number) => request<Reminder[]>(`/reminders/due?user_id=${userId}`),
   markNotified: (reminderId: number, userId: number) =>
     request<void>(`/reminders/${reminderId}/notified?user_id=${userId}`, { method: "PATCH" }),
