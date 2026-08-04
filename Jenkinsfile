@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent any
 
     options {
         timestamps()
@@ -20,50 +20,21 @@ pipeline {
     }
 
     stages {
-        stage("Install dependencies") {
-            agent {
-                docker {
-                    image "node:22-alpine"
-                    reuseNode true
-                }
-            }
+        stage("Test and build frontend") {
             steps {
-                sh "npm ci"
-            }
-        }
-
-        stage("Test") {
-            agent {
-                docker {
-                    image "node:22-alpine"
-                    reuseNode true
-                }
-            }
-            steps {
-                sh "npm test"
-            }
-        }
-
-        stage("Build frontend") {
-            agent {
-                docker {
-                    image "node:22-alpine"
-                    reuseNode true
-                }
-            }
-            steps {
-                sh "npm run build"
+                sh '''
+                    docker run --rm \
+                      --user "$(id -u):$(id -g)" \
+                      -e HOME=/tmp \
+                      -v "$PWD:/workspace" \
+                      -w /workspace \
+                      node:22-alpine \
+                      sh -c 'npm ci --cache /tmp/npm-cache && npm test && npm run build'
+                '''
             }
         }
 
         stage("Build Docker image") {
-            agent {
-                docker {
-                    image "docker:27-cli"
-                    args "-v /var/run/docker.sock:/var/run/docker.sock"
-                    reuseNode true
-                }
-            }
             steps {
                 sh 'docker build --build-arg "VITE_API_URL=$VITE_API_URL" --tag "$IMAGE_NAME:$IMAGE_TAG" .'
             }
