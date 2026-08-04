@@ -23,13 +23,14 @@ pipeline {
         stage("Test and build frontend") {
             steps {
                 sh '''
-                    docker run --rm \
-                      --user "$(id -u):$(id -g)" \
+                    tar -czf - \
+                      --exclude=.git \
+                      --exclude=node_modules \
+                      --exclude=dist \
+                      . | docker run --rm -i \
                       -e HOME=/tmp \
-                      -v "$PWD:/workspace" \
-                      -w /workspace \
                       node:22-alpine \
-                      sh -c 'npm ci --cache /tmp/npm-cache && npm test && npm run build'
+                      sh -c 'mkdir /workspace && tar -xzf - -C /workspace && cd /workspace && npm ci --cache /tmp/npm-cache && npm test && npm run build'
                 '''
             }
         }
