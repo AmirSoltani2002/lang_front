@@ -21,7 +21,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "language-flashcards-frontend"
-        IMAGE_TAG = "${env.BUILD_NUMBER}"
+        IMAGE_TAG = "latest"
     }
 
     stages {
