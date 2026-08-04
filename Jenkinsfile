@@ -14,8 +14,8 @@ pipeline {
         )
         string(
             name: "NPM_REGISTRY",
-            defaultValue: "https://registry.npmjs.org/",
-            description: "npm registry or reachable mirror, for example https://registry.npmmirror.com/"
+            defaultValue: "https://package-mirror.liara.ir/repository/npm/",
+            description: "npm registry or reachable mirror"
         )
     }
 
