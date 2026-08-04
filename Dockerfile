@@ -3,7 +3,14 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+# Jenkins builds may have a slow or intermittently idle connection to npmjs.org.
+# Keep npm from aborting a valid build while dependencies are downloading.
+RUN npm config set fetch-retries 5 \
+    && npm config set fetch-retry-factor 2 \
+    && npm config set fetch-retry-mintimeout 20000 \
+    && npm config set fetch-retry-maxtimeout 120000 \
+    && npm config set fetch-timeout 600000 \
+    && npm ci --no-audit --no-fund
 
 COPY . .
 
