@@ -6,6 +6,7 @@ import { useReminderNotifications } from "./hooks/useReminderNotifications";
 import { NewWordPage } from "./pages/NewWordPage";
 import { RemindersPage } from "./pages/RemindersPage";
 import { SignInPage } from "./pages/SignInPage";
+import { WordsPage } from "./pages/WordsPage";
 import type { User } from "./types";
 
 const STORAGE_KEY = "wordloom-user";
@@ -47,6 +48,7 @@ export default function App() {
       >
         <Routes>
           <Route path="/words/new" element={<NewWordPage user={user} />} />
+          <Route path="/words" element={<WordsPage user={user} />} />
           <Route
             path="/reminders"
             element={
