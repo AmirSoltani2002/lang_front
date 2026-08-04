@@ -38,6 +38,10 @@ export function Layout({
               <span aria-hidden="true">＋</span>
               Add a word
             </NavLink>
+            <NavLink to="/words">
+              <span aria-hidden="true">☷</span>
+              Added words
+            </NavLink>
             <NavLink to="/reminders">
               <span aria-hidden="true">◷</span>
               Reviews
