@@ -3,7 +3,7 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-ARG NPM_REGISTRY=https://registry.npmjs.org/
+ARG NPM_REGISTRY=https://package-mirror.liara.ir/repository/npm/
 # Jenkins builds may have a slow or intermittently idle connection to npmjs.org.
 # Keep npm from aborting a valid build while dependencies are downloading.
 RUN npm config set registry "${NPM_REGISTRY}" \
